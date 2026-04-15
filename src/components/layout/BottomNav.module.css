@@ -1,0 +1,392 @@
+/* ─────────────────────────────────────────────
+   BottomNav — Mobile-only floating navigation
+   GPU-friendly: all animations on transform & opacity only
+   
+   PERFORMANCE NOTES:
+   • Only the active icon runs a looping animation (1 element, not 5)
+   • All keyframes use transform only → GPU-composited, zero layout/paint
+   • Long cycle durations (4-5s) with brief motion windows → mostly idle
+   • prefers-reduced-motion kills everything instantly
+   ───────────────────────────────────────────── */
+
+/* ═══ Wrapper & Pill ═══ */
+
+.bottomNavWrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  padding: 10px 14px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 50;
+}
+
+.bottomNav {
+  pointer-events: auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  border-radius: 20px;
+  padding: 4px 2px;
+  box-shadow:
+    0 2px 4px rgba(10, 25, 47, 0.03),
+    0 6px 16px rgba(10, 25, 47, 0.06),
+    0 16px 40px rgba(10, 25, 47, 0.08);
+}
+
+/* ═══ Nav Item ═══ */
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  padding: 8px 10px 6px;
+  border-radius: 14px;
+  position: relative;
+  min-width: 56px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ═══ Icon Wrapper ═══ */
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  transform: translateY(0) scale(1);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+/* ═══ SVG Icon Base ═══ */
+
+.icon {
+  width: 22px;
+  height: 22px;
+  stroke: var(--color-text-muted);
+  fill: none;
+  overflow: visible;
+  transition:
+    stroke 0.25s ease,
+    fill 0.25s ease;
+}
+
+/* ═══ Label ═══ */
+
+.label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--color-text-muted);
+  transition:
+    color 0.25s ease,
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateY(0);
+  opacity: 0.7;
+  line-height: 1;
+}
+
+/* ═══ Active State ═══ */
+
+.navItem.active {
+  background: rgba(212, 175, 55, 0.08);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.1) inset;
+}
+
+.navItem.active .iconWrap {
+  transform: translateY(-2px) scale(1.12);
+}
+
+.navItem.active .icon {
+  stroke: var(--color-accent);
+  filter: drop-shadow(0 1px 3px rgba(212, 175, 55, 0.25));
+}
+
+.navItem.active .label {
+  color: var(--color-accent);
+  font-weight: 600;
+  opacity: 1;
+}
+
+/* Active indicator dot — animated scale-in */
+.navItem.active::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s ease;
+}
+
+/* Inactive dot — hidden */
+.navItem::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  transform: translateX(-50%) scale(0);
+  opacity: 0;
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    opacity 0.2s ease;
+}
+
+/* ═══ Hover / Focus (non-active) ═══ */
+
+.navItem:not(.active):hover .icon {
+  stroke: var(--color-primary);
+}
+
+.navItem:not(.active):hover .label {
+  color: var(--color-primary);
+  opacity: 0.9;
+}
+
+.navItem:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ═══ Tap Feedback ═══ */
+
+@keyframes tapPulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+.tapped {
+  animation: tapPulse 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+
+/* ══════════════════════════════════════════════
+   PER-ICON MICRO-ANIMATIONS (Active idle loops)
+   
+   Each animation has a long total cycle (4-5s).
+   The actual motion only occupies ~15-20% of the cycle.
+   The rest of the time the element sits at its base transform.
+   This means the GPU is idle >80% of each cycle.
+   ══════════════════════════════════════════════ */
+
+/* ─── HOME: Gentle bounce on the roof ─── */
+@keyframes homeRoofBounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  85%           { transform: translateY(-1.5px); }
+  90%           { transform: translateY(0.5px); }
+  95%           { transform: translateY(-0.5px); }
+}
+
+.homeRoof,
+.homeBody {
+  transform-origin: center;
+}
+
+.iconHomeActive .homeRoof {
+  animation: homeRoofBounce 4s ease-in-out infinite;
+}
+
+/* ─── TICKET: Swing/tilt ─── */
+@keyframes ticketSwing {
+  0%, 78%, 100% { transform: rotate(0deg); }
+  82%           { transform: rotate(-6deg); }
+  86%           { transform: rotate(5deg); }
+  90%           { transform: rotate(-3deg); }
+  94%           { transform: rotate(1deg); }
+}
+
+.ticketBody,
+.ticketDash {
+  transform-origin: center;
+}
+
+.iconTicketActive {
+  animation: ticketSwing 4.5s ease-in-out infinite;
+}
+
+/* ─── USERS: Second user peeks in ─── */
+@keyframes userPeek {
+  0%, 75%, 100% { transform: translateX(0); opacity: 1; }
+  80%           { transform: translateX(2px); opacity: 0.7; }
+  85%           { transform: translateX(0); opacity: 1; }
+  90%           { transform: translateX(1px); opacity: 0.8; }
+  95%           { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes userNod {
+  0%, 78%, 100% { transform: translateY(0); }
+  83%           { transform: translateY(-1px); }
+  88%           { transform: translateY(0); }
+}
+
+.userHead1,
+.userBody1,
+.userHead2,
+.userBody2 {
+  transform-origin: center;
+}
+
+.iconUsersActive .userHead1 {
+  animation: userNod 4s ease-in-out infinite;
+}
+
+.iconUsersActive .userHead2 {
+  animation: userPeek 4s ease-in-out infinite;
+}
+
+/* ─── GRID: Subtle diagonal shuffle ─── */
+@keyframes gridPulseTL {
+  0%, 80%, 100% { transform: scale(1); }
+  85%           { transform: scale(0.88); }
+  90%           { transform: scale(1); }
+}
+
+@keyframes gridPulseTR {
+  0%, 82%, 100% { transform: scale(1); }
+  87%           { transform: scale(0.88); }
+  92%           { transform: scale(1); }
+}
+
+@keyframes gridPulseBL {
+  0%, 84%, 100% { transform: scale(1); }
+  89%           { transform: scale(0.88); }
+  94%           { transform: scale(1); }
+}
+
+@keyframes gridPulseBR {
+  0%, 86%, 100% { transform: scale(1); }
+  91%           { transform: scale(0.88); }
+  96%           { transform: scale(1); }
+}
+
+.gridTL { transform-origin: 6.5px 6.5px; }
+.gridTR { transform-origin: 17.5px 6.5px; }
+.gridBL { transform-origin: 6.5px 17.5px; }
+.gridBR { transform-origin: 17.5px 17.5px; }
+
+.iconGridActive .gridTL { animation: gridPulseTL 4s ease-in-out infinite; }
+.iconGridActive .gridTR { animation: gridPulseTR 4s ease-in-out infinite; }
+.iconGridActive .gridBL { animation: gridPulseBL 4s ease-in-out infinite; }
+.iconGridActive .gridBR { animation: gridPulseBR 4s ease-in-out infinite; }
+
+/* ─── MAIL: Flap flutter ─── */
+@keyframes mailFlutter {
+  0%, 80%, 100% { transform: scaleY(1); }
+  84%           { transform: scaleY(0.85); }
+  88%           { transform: scaleY(1.05); }
+  92%           { transform: scaleY(0.95); }
+  96%           { transform: scaleY(1); }
+}
+
+.mailFlap {
+  transform-origin: 12px 7px;
+}
+
+.mailBody {
+  transform-origin: center;
+}
+
+.iconMailActive .mailFlap {
+  animation: mailFlutter 4.5s ease-in-out infinite;
+}
+
+
+/* ══════════════════════════════════════════════
+   ON-CLICK ICON ANIMATIONS (one-shot)
+   These fire on the iconWrap when tapped, giving
+   each icon a characteristic "pop" via the parent.
+   ══════════════════════════════════════════════ */
+
+/* Shared click bounce for the icon wrapper */
+@keyframes iconClickBounce {
+  0%   { transform: translateY(0) scale(1); }
+  30%  { transform: translateY(-4px) scale(1.18); }
+  55%  { transform: translateY(1px) scale(0.95); }
+  75%  { transform: translateY(-1px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Click bounce for active items (includes the base offset) */
+@keyframes iconClickBounceActive {
+  0%   { transform: translateY(-2px) scale(1.12); }
+  30%  { transform: translateY(-6px) scale(1.28); }
+  55%  { transform: translateY(-1px) scale(1.06); }
+  75%  { transform: translateY(-3px) scale(1.16); }
+  100% { transform: translateY(-2px) scale(1.12); }
+}
+
+.tapped .iconWrap {
+  animation: iconClickBounce 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.tapped.active .iconWrap {
+  animation: iconClickBounceActive 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+
+/* ═══ Responsive ═══ */
+
+@media (min-width: 768px) {
+  .bottomNavWrapper {
+    display: none;
+  }
+}
+
+/* ═══ Reduced Motion ═══ */
+
+@media (prefers-reduced-motion: reduce) {
+  .iconWrap,
+  .icon,
+  .label,
+  .navItem,
+  .navItem::after,
+  .homeRoof,
+  .ticketBody,
+  .ticketDash,
+  .userHead1,
+  .userHead2,
+  .mailFlap,
+  .gridTL,
+  .gridTR,
+  .gridBL,
+  .gridBR,
+  .iconHomeActive,
+  .iconTicketActive,
+  .iconUsersActive,
+  .iconGridActive,
+  .iconMailActive {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+}

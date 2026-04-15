@@ -1,0 +1,182 @@
+/* ─────────────────────────────────────────────
+   KipfWordmark — "KiPF" SVG stroke-draw animation
+   
+   Timeline (~2.4s draw + 0.5s crack = ~2.9s total):
+   
+   0.0s  Left accent fades in
+   0.1s  K stem draws
+   0.4s  K upper diagonal
+   0.6s  K lower diagonal
+   0.8s  i stem draws
+   0.9s  Egg draws (ellipse)
+   1.2s  P draws
+   1.6s  F stem+top draws
+   1.8s  F mid bar draws
+   2.0s  Right accent fades in
+   2.0s  Baseline rule fades in
+   2.3s  Crack group fades in
+   2.4s  Main crack zigzag draws
+   2.6s  Branch cracks draw
+   2.7s  Chip fragment draws
+   ───────────────────────────────────────────── */
+
+/* ═══ Wrapper ═══ */
+
+.wordmarkWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.wordmarkSvg {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  opacity: 0.55;
+}
+
+/* ═══ Letter Paths — invisible by default ═══ */
+
+.letterPath {
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+}
+
+/* ═══ Egg Path ═══ */
+
+.eggPath {
+  stroke-dasharray: 90;
+  stroke-dashoffset: 90;
+}
+
+/* ═══ Crack Lines — hidden until triggered ═══ */
+
+.crackGroup {
+  opacity: 0;
+}
+
+.crackMain {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+}
+
+.crackBranch1,
+.crackBranch2 {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+}
+
+.crackChip {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+}
+
+/* ═══ Accent Elements — hidden ═══ */
+
+.accentDot,
+.accentLine {
+  opacity: 0;
+}
+
+
+/* ══════════════════════════════════════════════
+   ANIMATION SEQUENCE — triggered by .animate class
+   ══════════════════════════════════════════════ */
+
+/* Easing: snappy material-style */
+
+/* ── Decorative accents ── */
+.animate .accentLeft      { animation: fadeIn 0.5s ease forwards 0.0s; }
+.animate .accentLineLeft  { animation: fadeIn 0.5s ease forwards 0.05s; }
+
+/* ── K: stem → upper → lower ── */
+.animate .kStem  { animation: draw 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.1s; }
+.animate .kUpper { animation: draw 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.38s; }
+.animate .kLower { animation: draw 0.30s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.55s; }
+
+/* ── i: stem → egg ── */
+.animate .iStem { animation: draw    0.30s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.72s; }
+.animate .egg   { animation: drawEgg 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.88s; }
+
+/* ── P ── */
+.animate .pLetter { animation: draw 0.50s cubic-bezier(0.4, 0, 0.2, 1) forwards 1.18s; }
+
+/* ── F: stem → mid bar ── */
+.animate .fStem { animation: draw 0.40s cubic-bezier(0.4, 0, 0.2, 1) forwards 1.50s; }
+.animate .fMid  { animation: draw 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards 1.72s; }
+
+/* ── Right accent + baseline ── */
+.animate .accentLineRight { animation: fadeIn 0.5s ease forwards 1.90s; }
+.animate .accentRight     { animation: fadeIn 0.5s ease forwards 1.95s; }
+.animate .baseline        { animation: fadeIn 0.6s ease forwards 2.00s; }
+
+/* ── Crack sequence ── */
+.animate .crackGroup   { animation: fadeIn    0.20s ease forwards 2.30s; }
+.animate .crackMain    { animation: drawCrack 0.40s cubic-bezier(0.4, 0, 0.2, 1) forwards 2.35s; }
+.animate .crackBranch1 { animation: drawCrack 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards 2.55s; }
+.animate .crackBranch2 { animation: drawCrack 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards 2.60s; }
+.animate .crackChip    { animation: drawCrack 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards 2.70s; }
+
+
+/* ═══ Keyframes ═══ */
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes drawEgg {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes drawCrack {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+
+/* ═══ Responsive ═══ */
+
+@media (max-width: 480px) {
+  .wordmarkSvg {
+    max-width: 220px;
+  }
+}
+
+@media (min-width: 768px) {
+  .wordmarkSvg {
+    max-width: 300px;
+    opacity: 0.5;
+  }
+}
+
+@media (min-width: 1200px) {
+  .wordmarkSvg {
+    max-width: 340px;
+  }
+}
+
+
+/* ═══ Reduced Motion ═══ */
+
+@media (prefers-reduced-motion: reduce) {
+  .letterPath,
+  .eggPath,
+  .crackMain,
+  .crackBranch1,
+  .crackBranch2,
+  .crackChip {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
+  }
+
+  .crackGroup,
+  .accentDot,
+  .accentLine {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}

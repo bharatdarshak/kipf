@@ -1,0 +1,234 @@
+/* ==============================
+   Home Page Styles
+   ============================== */
+
+.pageWrapper {
+  padding-bottom: 80px; /* Space for bottom nav */
+}
+
+@media (min-width: 768px) {
+  .pageWrapper {
+    padding-bottom: 0;
+  }
+}
+
+/* Section Headers */
+.sectionHeader {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sectionAccent {
+  width: 48px;
+  height: 3px;
+  background: var(--gradient-gold);
+  border-radius: var(--radius-full);
+}
+
+.sectionTag {
+  font-family: var(--font-inter);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+}
+
+.sectionTagLight {
+  color: var(--color-accent);
+}
+
+.sectionTitle {
+  font-family: var(--font-sora);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.sectionTitleLight {
+  color: #fff;
+}
+
+.sectionDesc {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.sectionDescLight {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+@media (min-width: 768px) {
+  .sectionTitle {
+    font-size: 2.5rem;
+  }
+}
+
+/* Overview Section */
+.overviewSection {
+  padding: var(--space-3xl) var(--space-md);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Participate Section */
+.participateSection {
+  position: relative;
+  padding: var(--space-4xl) var(--space-md);
+  overflow: hidden;
+}
+
+.participateBg {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-section);
+  z-index: 0;
+}
+
+/* Decorative pattern */
+.participateBg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(212, 175, 55, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  z-index: 1;
+}
+
+.participateContent {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.participateGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .participateGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .participateGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.participateCard {
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  transition: transform var(--duration-normal) var(--ease-smooth),
+              border-color var(--duration-normal) var(--ease-smooth),
+              box-shadow var(--duration-normal) var(--ease-smooth);
+}
+
+.participateCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212, 175, 55, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.participateCardInner {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.participateIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(212, 175, 55, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  transition: transform var(--duration-normal) var(--ease-bounce);
+}
+
+.participateIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.participateCard:hover .participateIcon {
+  transform: scale(1.15) rotate(-4deg);
+}
+
+.participateLabel {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--color-accent);
+  font-family: var(--font-inter);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.participateTitle {
+  font-family: var(--font-sora);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.participateDesc {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.outlineBtnLight {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.outlineBtnLight:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+
+

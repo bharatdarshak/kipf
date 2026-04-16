@@ -46,25 +46,23 @@ export function block(
   overrides?: Partial<Stall>,
 ): Stall[] {
   return ids.flatMap((row, dy) =>
-    row
-      .map((id, dx) =>
-        id
-          ? ({
-              id,
-              label: id,
-              x: ox + dx,
-              y: oy + dy,
-              w: 1,
-              h: 1,
-              status: 'booked' as StallStatus,
-              size: 'standard' as StallSize,
-              price: 25000,
-              stallType: '3m × 3m Open Stall',
-              ...overrides,
-            } satisfies Stall)
-          : null,
-      )
-      .filter((s): s is Stall => s !== null),
+    row.flatMap((id, dx) =>
+      id
+        ? [{
+            id,
+            label: id,
+            x: ox + dx,
+            y: oy + dy,
+            w: 1,
+            h: 1,
+            status: 'booked' as StallStatus,
+            size: 'standard' as StallSize,
+            price: 25000,
+            stallType: '3m × 3m Open Stall',
+            ...overrides,
+          } satisfies Stall]
+        : []
+    ),
   );
 }
 

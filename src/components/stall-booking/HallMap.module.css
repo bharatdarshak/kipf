@@ -1,0 +1,52 @@
+/*
+ * HallMap.module.css
+ *
+ * The outer container fills the parent (mapArea) via position:absolute inset:0
+ * so it always has real pixel dimensions for the ResizeObserver to measure.
+ * The inner mapCanvas uses CSS transform for pan+zoom and overflows via hidden.
+ *
+ * touch-action:none prevents the browser from hijacking touch gestures
+ * for scrolling/zooming. All touch handling is done in JS with
+ * non-passive addEventListener so preventDefault() works.
+ */
+
+.mapOuter {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #E8F0FE;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mapOuter:active {
+  cursor: grabbing;
+}
+
+/* Pan/zoom wrapper — positioned at (0,0) and transformed via inline styles */
+.mapCanvas {
+  display: block;
+  will-change: transform;
+  pointer-events: none; /* let events pass through to the SVG <g> elements */
+}
+
+.mapCanvas > svg {
+  pointer-events: auto;
+}
+
+/* Stall hover (desktop only) */
+.stallRect {
+  transition: filter 120ms ease;
+}
+
+:global(g[data-stall]):hover .stallRect {
+  filter: brightness(0.92);
+}
+
+@media (hover: none) {
+  :global(g[data-stall]) {
+    cursor: pointer;
+  }
+}

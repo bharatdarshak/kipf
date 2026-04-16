@@ -1,0 +1,224 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-base);
+}
+
+/* ── Page header ── */
+.pageHeader {
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 16px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.yearTag {
+  font-family: var(--font-inter);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.heading {
+  font-family: var(--font-sora);
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.subheading {
+  font-family: var(--font-inter);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.headerBottom {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.legendWrap {
+  margin-left: auto;
+}
+
+/* ── Hall strip ── */
+.hallStrip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: #F8FAFC;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.hallName {
+  font-family: var(--font-sora);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.hallCount {
+  font-family: var(--font-inter);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-left: 4px;
+}
+
+/* ── Map area ── */
+.mapArea {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Map controls — always overlaid on the map ── */
+.mapControls {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 10;
+}
+
+/* ── Hint banner ── */
+.hintBanner {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(10, 25, 47, 0.72);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 99px;
+  font-family: var(--font-inter);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: hintFade 6s ease-in-out forwards;
+  z-index: 5;
+}
+
+@keyframes hintFade {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  10%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ════════════════════════════════════════════
+   Mobile Layout Overrides
+   ════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .pageHeader {
+    padding: 10px 14px 8px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .headerTop {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .headerTitles {
+    align-items: center;
+  }
+
+  .yearTag {
+    font-size: 0.6875rem;
+  }
+
+  .heading {
+    font-size: 1.25rem;
+  }
+
+  .subheading {
+    display: none;
+  }
+
+  .headerBottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .legendWrap {
+    margin-left: 0;
+  }
+
+  .hallStrip {
+    padding: 6px 14px;
+    justify-content: center;
+    font-size: 0.8125rem;
+  }
+
+  /*
+   * On mobile the BottomNav is ~70px fixed at the bottom.
+   * Reserve space so the map doesn't go behind it.
+   * padding-bottom on mapArea creates a safe zone.
+   */
+  .mapArea {
+    /* The bottom padding keeps map content above the bottom nav */
+    padding-bottom: 72px;
+  }
+
+  /*
+   * Position controls above the BottomNav safe area.
+   * bottom: 72px (BottomNav) + 12px gap = 84px
+   */
+  .mapControls {
+    right: 8px;
+    bottom: 84px;
+  }
+
+  .hintBanner {
+    bottom: 84px;
+    font-size: 0.6875rem;
+    white-space: normal;
+    text-align: center;
+    max-width: calc(100vw - 90px);
+  }
+}
+
+@media (max-width: 480px) {
+  .hallStrip {
+    padding: 5px 12px;
+    gap: 6px;
+  }
+}
